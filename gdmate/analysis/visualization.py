@@ -1,6 +1,7 @@
 """
 Module for visualizing model results using Pyvista and other tools
 """
+import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
