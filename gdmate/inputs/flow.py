@@ -47,7 +47,7 @@ class FlowLaw:
             self.E_pub = 375 # kJ/mol
             self.V_pub = 4 # 10^-6 m^3/mol
 
-        values = (self.A_raw,self.n,self.m,self.r,self.E,self.V)
+        values = (self.A_pub,self.n,self.m,self.r,self.E,self.V)
         return(values)
 
     def convert2SI(self):
