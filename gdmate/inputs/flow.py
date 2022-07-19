@@ -23,7 +23,7 @@ class FlowLaw:
             self.E_pub = 530 # kJ/mol
             self.V_pub = 18 # 10^-6 m^3/mol - note this is actually a range
 
-        elif props = ('olivine','hirth','dry','diffusion'):
+        elif props == ('olivine','hirth','dry','diffusion'):
             self.A_pub = 1.5e9 # s^-1 MPa^-n um^m COH^-r
             self.n = 1
             self.m = 3
@@ -31,7 +31,7 @@ class FlowLaw:
             self.E_pub = 375 # kJ/mol
             self.V_pub = 4 # 10^-6 m^3/mol - note this is actually a range
         
-        elif props = ('olivine','hirth','wet','dislocation'):
+        elif props == ('olivine','hirth','wet','dislocation'):
             self.A_pub = 1600 # s^-1 MPa^-n um^m COH^-r
             self.n = 3.5
             self.m = 0
@@ -39,7 +39,7 @@ class FlowLaw:
             self.E_pub = 520 # kJ/mol
             self.V_pub = 22 # 10^-6 m^3/mol
         
-        elif props = 'olivine','hirth','wet','diffusion'):
+        elif props == ('olivine','hirth','wet','diffusion'):
             self.A_pub = 2.5e7 # s^-1 MPa^-n um^m COH^-r
             self.n = 1
             self.m = 3
@@ -51,21 +51,29 @@ class FlowLaw:
         return(values)
 
     def convert2SI(self):
-        self.A_SI = self.A_pub / 1e6^-self.n / 1e6^self.m / self.COH^-self.r # s^-1 Pa^-n m^m COH^-r
+        """Convert published values to SI units"""
+        self.A_SI = self.A_pub / 1e6**-self.n / 1e6**self.m / self.COH**-self.r # s^-1 Pa^-n m^m COH^-r
 
         self.E_SI = self.E_pub * 1e3 # j/mol
 
         self.V_SI = self.V_pub * 1e-6 # m^3/mol
 
         return(self.A_SI,self.E_SI,self.V_SI)
+
+    def scaleA(self,experiment='axial',function='strain rate'):
+        """Scale prefactor (A) according to the appropriate experiment, following Gerya textbook"""
+        if experiment=='axial':
+            if function=='strain rate':
+                factor = 1/(2**(self.n-1)*3**((self.n+1)/(2*self.n)))
+            elif function=='stress':
+                factor = 1/(3**((self.n+1)/2))
         
+        elif experiment=='simple shear':
+            if function=='strain rate':
+                factor = 1/(2**((2*self.n-1)/self.n))
+            elif function=='stress':
+                factor = 1/2**self.n
 
+        self.A_scaled = self.A_SI*factor
 
-def get_parameters(material,source,wetness='dry',creep='dislocation'):
-    """
-    Function to extract the appropriate published parameters
-    """
-
-    flow_law = FlowLaw(material,source,wetness,creep)
-
-    return(flow_law)
+        return(self.A_scaled)
