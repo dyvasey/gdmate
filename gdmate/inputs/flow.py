@@ -64,15 +64,15 @@ class FlowLaw:
         """Scale prefactor (A) according to the appropriate experiment, following Gerya textbook"""
         if experiment=='axial':
             if function=='strain rate':
-                factor = 1/(2**(self.n-1)*3**((self.n+1)/(2*self.n)))
+                factor = (2**(self.n-1)*3**((self.n+1)/(2*self.n)))
             elif function=='stress':
-                factor = 1/(3**((self.n+1)/2))
+                factor = (3**((self.n+1)/2))
         
         elif experiment=='simple shear':
             if function=='strain rate':
-                factor = 1/(2**((2*self.n-1)/self.n))
+                factor = (2**((2*self.n-1)/self.n))
             elif function=='stress':
-                factor = 1/2**self.n
+                factor = 2**self.n
 
         self.A_scaled = self.A_SI*factor
 
