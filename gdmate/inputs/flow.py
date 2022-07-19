@@ -52,7 +52,7 @@ class FlowLaw:
 
     def convert2SI(self):
         """Convert published values to SI units"""
-        self.A_SI = self.A_pub / 1e6**-self.n / 1e6**self.m / self.COH**-self.r # s^-1 Pa^-n m^m COH^-r
+        self.A_SI = self.A_pub * 1e-6**-self.n * 1e-6**self.m * self.COH**-self.r # s^-1 Pa^-n m^m COH^-r
 
         self.E_SI = self.E_pub * 1e3 # j/mol
 
