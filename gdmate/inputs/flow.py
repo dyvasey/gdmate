@@ -81,4 +81,8 @@ class FlowLaw:
     def scaleA_dannberg(self):
         """Scale prefactor (A) according to Dannberg et al., 2017"""
 
-        factor = self.A_scaled*3**((self.n+1)/2)/2
+        factor = 3**((self.n+1)/2)/2
+
+        self.A_scaled = self.A_SI*factor
+        
+        return(self.A_scaled)
