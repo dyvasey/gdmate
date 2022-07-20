@@ -1,6 +1,7 @@
 """
 Module for generating appropriate flow law parameters
 """
+import numpy as np
 
 class FlowLaw:
     def __init__(self,material,source,wetness,creep,COH=1000):
@@ -47,6 +48,14 @@ class FlowLaw:
             self.E_pub = 375 # kJ/mol
             self.V_pub = 4 # 10^-6 m^3/mol
 
+        elif props == ('anorthite','rybacki','wet','dislocation'):
+            self.A_pub = np.exp(0.2) # s^-1 MPa^-n um^m COH^-r
+            self.n = 3
+            self.m = 0
+            self.r = 1
+            self.E_pub = 345 # kJ/mol
+            self.V_pub = 38/100**3*10**6 # 10^-6 m^3/mol
+
         values = (self.A_pub,self.n,self.m,self.r,self.E_pub,self.V_pub)
         return(values)
 
@@ -84,5 +93,5 @@ class FlowLaw:
         factor = 3**((self.n+1)/2)/2
 
         self.A_scaled = self.A_SI*factor
-        
+
         return(self.A_scaled)
