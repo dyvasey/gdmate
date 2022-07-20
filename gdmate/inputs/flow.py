@@ -60,7 +60,7 @@ class FlowLaw:
 
         return(self.A_SI,self.E_SI,self.V_SI)
 
-    def scaleA(self,experiment='axial',function='strain rate'):
+    def scaleA_gerya(self,experiment='axial',function='strain rate'):
         """Scale prefactor (A) according to the appropriate experiment, following Gerya textbook"""
         if experiment=='axial':
             if function=='strain rate':
@@ -77,3 +77,8 @@ class FlowLaw:
         self.A_scaled = self.A_SI*factor
 
         return(self.A_scaled)
+
+    def scaleA_dannberg(self):
+        """Scale prefactor (A) according to Dannberg et al., 2017"""
+
+        factor = self.A_scaled*3**((self.n+1)/2)/2
