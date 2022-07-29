@@ -6,3 +6,4 @@ API
 
     gdmate.helloworld
     gdmate.flow_laws
+    gdmate.visualization

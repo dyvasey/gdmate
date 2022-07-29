@@ -13,6 +13,7 @@ Welcome to gdmate's documentation!
    api
    notebooks/helloworld
    notebooks/flow_laws
+   notebooks/visualization
 
 
 
