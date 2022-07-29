@@ -130,7 +130,7 @@ def scaleA(A_SI,n):
     Returns:
         A_scaled: Scaled A in SI units (MPa^-n-r um^m_diff s^-1)
     """
-    A_scaled = 2**(n-1) * 3**((n+1)/2) * A_SI
+    A_scaled = 3**((n+1)/2)/2 * A_SI
 
     return(A_scaled)
 
