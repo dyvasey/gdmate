@@ -126,8 +126,8 @@ def test_scaleA():
     an_wet_dis_rybacki]
 
     # Make list of correct scaled prefactors
-    answers = [7.37e-15,3.80e-25,4.50e-15,3.00e-24,
-                1.37e-26,5.71e-23]
+    answers = [6.51e-16,3.36e-26,2.25e-15,1.5e-24,
+                8.57e-28,7.13e-24]
 
     # Loop through each set of published values, convert to SI units and scale
     # A, then verify correct answer is obtained.
