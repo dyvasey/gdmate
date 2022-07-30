@@ -20,6 +20,7 @@ requirements:
     - scipy
     - matplotlib
     - pyvista
+    - numba
 
 test:
   source_files:
