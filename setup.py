@@ -25,7 +25,8 @@ setup(
     packages=["gdmate","gdmate.visualization","gdmate.analysis_modules",
         "gdmate.io","gdmate.education","gdmate.material_models"],
     python_requires=">=3.7, <4",
-    install_requires=["numpy","scipy","matplotlib","pyvista","numba"],
+    install_requires=["numpy","scipy","matplotlib","pyvista","numba","tqdm",
+        "joblib"],
     # package_data={ 
     # },
 )

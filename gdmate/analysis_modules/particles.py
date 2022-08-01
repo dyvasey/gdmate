@@ -1,76 +1,89 @@
 """
 Module to analyze and post-process particles from ASPECT
 """
+import os
 import numpy as np
-from numba import jit
 from scipy.spatial import KDTree
+from joblib import Parallel,delayed
+from tqdm import tqdm
 
-def nearest_neighbor_KDTree(id,positions):
+def nearest_neighbor_KDTree(position,positions):
     """
     Find nearest neighbor of a particle using X,Y,Z positions.
 
     Uses KDTree function from SciPy
     """
-    # Remove the particle from possible nearest neighbors
-    # so it doesn't find itself
-    mask = np.ones(len(positions),dtype=bool)
-    mask[id] = False
-    other_positions = positions[mask]
-    
     # Get nearest neighbor from KDTree
-    distance,index = KDTree(other_positions).query(positions[id])
+    distance,index = KDTree(positions).query(position)
 
-    # Get position of the nearest neighbor
-    nn_position = other_positions[index]
+    return(index)
 
-    # Find original index of the nearest neighbor
-    nn = int(np.where(np.all(positions==nn_position,axis=1))[0])
-
-    return(nn)
-
-@jit
-def nearest_neighbor_numpy(id,positions):
-    """
-    Find nearest neighbor of a particle using X,Y,Z positions.
-
-    Uses pure Numpy to allow optimization with Numba
-    """
-    # Get position of particle
-    pos = positions[id]
-    
-    # Remove the particle from possible nearest neighbors
-    # so it doesn't find itself
-    mask = np.empty(len(positions),dtype=np.bool_)
-    mask[id] = False
-    other_positions = positions[mask]
-
-    # Calculate distances
-
-    distances = np.sqrt(
-        (pos[0]-other_positions[:,0])**2 + 
-        (pos[1]-other_positions[:,1])**2 +
-        (pos[2]-other_positions[:,2])**2
-        )
-
-    # Get index of the minimum distance
-    index = np.argmin(distances)
-
-    print(np.min(distances))
-    # Get position of the nearest neighbor
-    nn_position = other_positions[index]
-
-    # Find original index of the nearest neighbor
-    for x in range(len(positions)):
-        if np.all(positions[x,0:3]==nn_position):
-            nn=int(x)
-
-    return(nn)
-
-def run_scalar_forward(source_mesh,future_meshes,field):
+def run_scalar_forward(source_mesh,future_meshes,field,interpolate=True,
+                        processes=os.cpu_count()-6):
     """
     Apply scalar values on particles to same particles in future meshes
     """
-    source_particles = source_mesh.points
+    # Get ids of old particles
+    old_particles = source_mesh['id']
+
+    # Get scalars corresponding to those ids
+    old_scalars = source_mesh[field]
+
+    # Get positions for those ids
+    old_positions = source_mesh.points
 
     for mesh in future_meshes:
-        mesh_particles
+        
+        # Get new particle ids
+        new_particles = mesh['id']
+        new_positions = mesh.points
+
+        # Loop through new particles
+        new_scalars = Parallel(n_jobs=processes,require='sharedmem')(
+            delayed(get_previous_scalar)(particle,new_positions[k],old_particles,old_scalars,
+                old_positions, interpolate=interpolate) 
+                for k,particle in enumerate(tqdm(new_particles))
+            ) 
+
+        mesh[field] = new_scalars
+
+        old_particles = new_particles
+        old_scalars = np.array(new_scalars)
+        old_positions = new_positions
+
+    return(future_meshes)
+
+def get_previous_scalar(particle,position,old_particles,old_scalars,
+    old_positions,interpolate=False):
+    """
+    Get scalar value from previous timestep
+    """
+    # Try to get scalar from particles
+    scalar = old_scalars[particle==old_particles]
+    
+    # Check if scalar actually exists
+    if (scalar.size == 0) & (interpolate == False):
+        new_scalar = np.nan
+    
+    elif (scalar.size == 0) & (interpolate == True):
+        
+        # Find index of nearest neighbor
+        nn_index = nearest_neighbor_KDTree(position,old_positions)
+        
+        # Assign scalar using nearest neighbor index
+        new_scalar = float(old_scalars[nn_index])
+
+    elif (scalar.size == 1):
+        new_scalar = float(scalar)
+
+    else:
+        print(scalar.size)
+        print(particle)
+        print(scalar)
+        raise Exception("Something weird happened")
+
+    return(new_scalar)        
+
+
+
+
