@@ -32,7 +32,7 @@ def run_scalar_forward(source_mesh,future_meshes,field,interpolate=True,
     # Get positions for those ids
     old_positions = source_mesh.points
 
-    for mesh in future_meshes:
+    for mesh in tqdm(future_meshes):
         
         # Get new particle ids
         new_particles = mesh['id']
@@ -42,7 +42,7 @@ def run_scalar_forward(source_mesh,future_meshes,field,interpolate=True,
         new_scalars = Parallel(n_jobs=processes,require='sharedmem')(
             delayed(get_previous_scalar)(particle,new_positions[k],old_particles,old_scalars,
                 old_positions, interpolate=interpolate) 
-                for k,particle in enumerate(tqdm(new_particles))
+                for k,particle in enumerate(new_particles)
             ) 
 
         mesh[field] = new_scalars
@@ -77,10 +77,8 @@ def get_previous_scalar(particle,position,old_particles,old_scalars,
         new_scalar = float(scalar)
 
     else:
-        print(scalar.size)
-        print(particle)
-        print(scalar)
-        raise Exception("Something weird happened")
+        # Skip if duplicates of particle id
+        new_scalar = np.nan
 
     return(new_scalar)        
 
