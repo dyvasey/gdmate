@@ -8,18 +8,28 @@ def get_published(material,source,creep,dryness):
     Get published values for flow law.
 
     Parameters:
-        material: rock/mineral being deformed
-        source: first author of original source
-        creep: dislocation or diffusion creep
-        dryness: wet or dry
+        material : str
+            Name of rock/mineral being deformed
+        source : str 
+            First author of original source publication
+        creep : str
+            Dislocation or diffusion creep
+        dryness : str
+            Whether material is wet or dry
 
     Returns:
-        A: prefactor (MPa^-n-r um^m_diff s^-1)
-        n: stress exponent
-        m_diff: grain size exponent
-        r: fugacity exponent
-        E: activation energy (kJ/mol)
-        V: activation volume (10^-6 m^3/mol)
+        A : float
+            Prefactor (MPa^-n-r um^m_diff s^-1)
+        n : float 
+            Stress exponent. Always 1 for diffusion creep.
+        m_diff : float
+            Grain size exponent. Always 0 for dislocation creep.
+        r : float
+            Fugacity exponent. Always 0 for dry rheology.
+        E : float
+            Activation energy (kJ/mol)
+        V : float
+            Activation volume (10^-6 m^3/mol)
     """
     # Combine properties into a tuple
     props = (material,source,creep,dryness)
@@ -91,11 +101,12 @@ def convert2SI(values):
     Only changes A, E, and V.
 
     Parameters:
-        values: tuple of published values (A,n,m_diff,r,E,V)
+        values : tuple of floats
+            Published values in the form (A,n,m_diff,r,E,V)
     
     Return:
-        values_SI: tuple of values with A,E, and V in SI units 
-                    (A_SI,n,m_diff,r,E_SI,V_SI)
+        values_SI : tuple of floats 
+            Published values with A,E, and V in SI units (A_SI,n,m_diff,r,E_SI,V_SI)
     """
 
     # Unpack tuple
@@ -120,15 +131,17 @@ def scaleA(A_SI,n):
     """
     Scale A from uniaxial experiments for ASPECT.
 
-    Implemented in Dannberg et al., 2017 supplementary Excel file. Appropriate
-    for relating strain rate to viscosity for a uniaxial strain experiment.
+    Appropriate for relating strain rate to viscosity for a uniaxial strain experiment.
 
     Parameters:
-        A_SI: prefactor in SI units (MPa^-n-r um^m_diff s^-1)
-        n: stress exponent
+        A_SI : float
+            Prefactor in SI units (MPa^-n-r um^m_diff s^-1)
+        n : float
+            stress exponent
     
     Returns:
-        A_scaled: Scaled A in SI units (MPa^-n-r um^m_diff s^-1)
+        A_scaled : float
+            Scaled A in SI units (MPa^-n-r um^m_diff s^-1)
     """
     A_scaled = 3**((n+1)/2)/2 * A_SI
 
@@ -136,25 +149,35 @@ def scaleA(A_SI,n):
 
 def get_flow_law_parameters(material,source,creep,dryness):
     """
-    Get flow law parameters in correct units and scaled for ASPECT
+    Get flow law parameters in correct units and scaled for ASPECT.
 
     Converts published values to SI units and then scales the prefactor (A).
     Prints the values at each step and returns the final values for use in 
     ASPECT.
 
     Parameters:
-        material: rock/mineral being deformed
-        source: first author of original source
-        creep: dislocation or diffusion creep
-        dryness: wet or dry
+        material : str
+            Name of rock/mineral being deformed
+        source : str 
+            First author of original source publication
+        creep : str
+            Dislocation or diffusion creep
+        dryness : str
+            Whether material is wet or dry
 
     Returns:
-        A_scaled: scaled prefactor (Pa^-n-r m^m_diff s^-1)
-        n: stress exponent
-        m_diff: grain size exponent
-        r: fugacity exponent
-        E_SI: activation energy (J/mol)
-        V_SI: activation volume (m^3/mol)
+        A_scaled : float
+            Scaled A in SI units (MPa^-n-r um^m_diff s^-1)
+        n : float 
+            Stress exponent. Always 1 for diffusion creep.
+        m_diff : float
+            Grain size exponent. Always 0 for dislocation creep.
+        r : float
+            Fugacity exponent. Always 0 for dry rheology.
+        E_SI : float
+            Activation energy in SI units (J/mol)
+        V_SI : float
+            Activation volume in SI units (m^3/mol)
     """
 
     # Get the published values
